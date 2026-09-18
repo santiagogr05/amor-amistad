@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Corazón en Flor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Playfair+Display:ital,wght@0,600;1,600&display=swap">
+<style>
+  :root{
+    --night:#241934;
+    --night-deep:#160f22;
+    --dawn:#ffe3df;
+    --dawn-deep:#ffd0c4;
+    --heart:#ff4d6d;
+    --petal:#fff6f8;
+    --petal-shadow:#f6d9de;
+    --gold:#f4b942;
+    --leaf:#4f7a52;
+    --leaf-dark:#345536;
+    --ink:#3a2434;
+    --ink-soft:#6b4a5c;
+    --glass-fill: rgba(255,255,255,0.4);
+    --glass-border: rgba(255,255,255,0.6);
+  }
+
+  *{ box-sizing:border-box; }
+
+  html, body{ margin:0; padding:0; }
+
+  body{
+    background:var(--night);
+    color:var(--petal);
+    font-family:'EB Garamond', Georgia, serif;
+    overflow-x:hidden;
+  }
+
+  .scroll-stage{
+    position:relative;
+    height:460vh;
+  }
+
+  .pin-target{
+    position:relative;
+    height:100vh;
+    overflow:hidden;
+    background:var(--night);
+  }
+
+  .flower-svg{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    display:block;
+  }
+
+  .stem{ fill:none; stroke:var(--leaf); stroke-width:7; stroke-linecap:round; }
+  .leaf path{ fill:var(--leaf); }
+  .leaf-2 path{ fill:var(--leaf-dark); }
+  .heart{ fill:var(--heart); }
+
+  .hint{
+    position:absolute;
+    left:50%;
+    bottom:calc(6% + env(safe-area-inset-bottom,0px));
+    transform:translateX(-50%);
+    margin:0;
+    font-family:'EB Garamond',serif;
+    font-style:italic;
+    font-size:1.05rem;
+    letter-spacing:.04em;
+    color:var(--petal);
+    opacity:.85;
+    text-shadow:0 2px 12px rgba(0,0,0,.55);
+    pointer-events:none;
+    text-align:center;
+    width:max-content;
+  }
+  .hint::after{
+    content:"";
+    display:block;
+    width:1px;height:34px;
+    margin:10px auto 0;
+    background:linear-gradient(var(--petal),transparent);
+    animation:hintDrop 1.8s ease-in-out infinite;
+  }
+  @keyframes hintDrop{
+    0%{ transform:translateY(-6px); opacity:0; }
+    40%{ opacity:1; }
+    100%{ transform:translateY(14px); opacity:0; }
+  }
+
+  .finale{
+    position:relative;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 10vh 20px 10vh;
+    background:
+      radial-gradient(120% 90% at 50% 15%, var(--dawn-deep), var(--dawn) 62%);
+  }
+
+  .glass-card{
+    position:relative;
+    width:100%;
+    max-width:440px;
+    padding:46px 34px 30px;
+    border-radius:26px;
+    background:var(--glass-fill);
+    border:1px solid var(--glass-border);
+    backdrop-filter:blur(22px) saturate(160%);
+    -webkit-backdrop-filter:blur(22px) saturate(160%);
+    box-shadow:
+      0 24px 70px rgba(120,60,80,.28),
+      inset 0 1px 0 rgba(255,255,255,.65);
+    text-align:center;
+  }
+  .glass-card::before{
+    content:"";
+    position:absolute;
+    inset:-1px;
+    border-radius:inherit;
+    padding:1px;
+    background:linear-gradient(160deg, rgba(255,255,255,.85), rgba(255,255,255,0) 42%);
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor;
+    mask-composite:exclude;
+    pointer-events:none;
+  }
+
+  .card-title{
+    margin:0 0 18px;
+    font-family:'Playfair Display', Georgia, serif;
+    font-style:italic;
+    font-weight:600;
+    font-size:clamp(1.5rem, 1.05rem + 1.7vw, 2.15rem);
+    color:var(--ink);
+    text-wrap:balance;
+  }
+
+  .card-message{
+    margin:0 0 24px;
+    font-family:'EB Garamond', Georgia, serif;
+    font-size:1.2rem;
+    line-height:1.65;
+    color:var(--ink-soft);
+  }
+
+  .signature{
+    margin:0;
+    font-family:'Alex Brush', cursive;
+    font-size:2.7rem;
+    color:var(--heart);
+    line-height:1;
+  }
+
+  @media (max-width:480px){
+    .glass-card{ padding:38px 24px 26px; }
+    .card-message{ font-size:1.08rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .hint::after{ animation:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="scroll-stage">
+  <div class="pin-target">
+    <svg class="flower-svg" viewBox="0 0 800 1300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <defs>
+        <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop id="skyTop" offset="0%" stop-color="#241934"/>
+          <stop id="skyBottom" offset="100%" stop-color="#5c3358"/>
+        </linearGradient>
+        <radialGradient id="petalGrad" cx="50%" cy="30%" r="75%">
+          <stop offset="0%" stop-color="#fff6f8"/>
+          <stop offset="100%" stop-color="#f6d9de"/>
+        </radialGradient>
+        <radialGradient id="centerGrad" cx="40%" cy="35%" r="70%">
+          <stop offset="0%" stop-color="#ffd977"/>
+          <stop offset="100%" stop-color="#f4b942"/>
+        </radialGradient>
+        <radialGradient id="glowGrad" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#fff2d6" stop-opacity="0.9"/>
+          <stop offset="100%" stop-color="#fff2d6" stop-opacity="0"/>
+        </radialGradient>
+        <filter id="softGlow" x="-60%" y="-60%" width="220%" height="220%">
+          <feGaussianBlur stdDeviation="10" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      <rect x="0" y="0" width="800" height="1300" fill="url(#skyGrad)"/>
+      <g class="stars" id="stars"></g>
+
+      <g class="hills">
+        <path d="M0,980 Q200,930 400,970 T800,950 L800,1300 L0,1300 Z" fill="#1c1428"/>
+        <path d="M0,1040 Q220,1000 420,1030 T800,1010 L800,1300 L0,1300 Z" fill="#150e1f"/>
+      </g>
+
+      <g class="particles" id="particles" opacity="0"></g>
+
+      <ellipse cx="400" cy="1290" rx="420" ry="60" fill="#120c1a"/>
+
+      <g class="plant" transform="translate(400,1250)">
+        <path class="stem" d="M0,-45 C -25,-140 25,-280 0,-430"/>
+
+        <g class="leaf leaf-1" transform="translate(-6,-160) rotate(-150) scale(0)">
+          <path d="M0,0 Q42,-26 84,0 Q42,26 0,0 Z"/>
+        </g>
+        <g class="leaf leaf-2" transform="translate(8,-300) rotate(-25) scale(0)">
+          <path d="M0,0 Q42,-26 84,0 Q42,26 0,0 Z"/>
+        </g>
+
+        <g class="flower-head" transform="translate(0,-430)">
+          <circle class="bloom-glow" r="150" fill="url(#glowGrad)" opacity="0"/>
+          <g class="petals" id="petals"></g>
+          <circle class="center" r="0" fill="url(#centerGrad)" filter="url(#softGlow)"/>
+        </g>
+
+        <path class="heart" id="heartSeed" d="M0,15 C -15,-5 -40,-5 -40,-25 C -40,-45 -20,-50 0,-30 C 20,-50 40,-45 40,-25 C 40,-5 15,-5 0,15 Z" filter="url(#softGlow)"/>
+      </g>
+    </svg>
+
+    <p class="hint">Desliza para florecer&nbsp;↓</p>
+  </div>
+</div>
+
+<section class="finale">
+  <div class="glass-card">
+    <h2 class="card-title">Feliz día de Amor &amp; Amistad.</h2>
+    <p class="card-message">Gracias por estos años que han sido muy bonitos, te quiero un montón.<br>Bso</p>
+    <p class="signature">Santty</p>
+  </div>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+(function(){
+  var svgNS = "http://www.w3.org/2000/svg";
+  var prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  // --- Generate stars ---
+  var starsGroup = document.getElementById('stars');
+  for (var i = 0; i < 50; i++) {
+    var s = document.createElementNS(svgNS, 'circle');
+    s.setAttribute('cx', (Math.random() * 800).toFixed(1));
+    s.setAttribute('cy', (Math.random() * 760).toFixed(1));
+    s.setAttribute('r', (Math.random() * 1.6 + 0.6).toFixed(2));
+    s.setAttribute('fill', '#fff6f8');
+    s.setAttribute('class', 'star');
+    s.style.opacity = (Math.random() * 0.7 + 0.3).toFixed(2);
+    starsGroup.appendChild(s);
+  }
+
+  // --- Generate pollen particles ---
+  var particlesGroup = document.getElementById('particles');
+  var particleColors = ['#fff6f8', '#f4b942', '#f6d9de'];
+  var particleEls = [];
+  for (var p = 0; p < 16; p++) {
+    var c = document.createElementNS(svgNS, 'circle');
+    var cx = 120 + Math.random() * 560;
+    var cy = 250 + Math.random() * 950;
+    c.setAttribute('cx', cx.toFixed(1));
+    c.setAttribute('cy', cy.toFixed(1));
+    c.setAttribute('r', (Math.random() * 2.6 + 1.8).toFixed(2));
+    c.setAttribute('fill', particleColors[p % particleColors.length]);
+    c.setAttribute('class', 'particle');
+    c.style.opacity = (Math.random() * 0.4 + 0.4).toFixed(2);
+    particlesGroup.appendChild(c);
+    particleEls.push(c);
+  }
+
+  // --- Generate petals ---
+  var petalsGroup = document.getElementById('petals');
+  var petalCount = 10;
+  var petalEls = [];
+  for (var k = 0; k < petalCount; k++) {
+    var g = document.createElementNS(svgNS, 'g');
+    g.setAttribute('class', 'petal');
+    g.setAttribute('transform', 'rotate(' + (k * (360 / petalCount)) + ')');
+    var e = document.createElementNS(svgNS, 'ellipse');
+    e.setAttribute('cx', '0');
+    e.setAttribute('cy', '-58');
+    e.setAttribute('rx', '17');
+    e.setAttribute('ry', '48');
+    e.setAttribute('fill', 'url(#petalGrad)');
+    e.setAttribute('stroke', '#f0c7ce');
+    e.setAttribute('stroke-width', '1');
+    g.appendChild(e);
+    petalsGroup.appendChild(g);
+    petalEls.push(g);
+  }
+  gsap.set(petalEls, { scale: 0, transformOrigin: '0px 0px' });
+
+  var leaf1 = document.querySelector('.leaf-1');
+  var leaf2 = document.querySelector('.leaf-2');
+  var stemPath = document.querySelector('.stem');
+  var heartSeed = document.getElementById('heartSeed');
+  var bloomGlow = document.querySelector('.bloom-glow');
+  var centerCircle = document.querySelector('.center');
+  var starsAll = document.querySelectorAll('.star');
+  var hillsGroup = document.querySelector('.hills');
+  var skyTop = document.getElementById('skyTop');
+  var skyBottom = document.getElementById('skyBottom');
+  var hint = document.querySelector('.hint');
+
+  var stemLen = stemPath.getTotalLength();
+  gsap.set(stemPath, { strokeDasharray: stemLen, strokeDashoffset: stemLen });
+
+  // --- Master scroll-driven bloom timeline ---
+  var tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: '.scroll-stage',
+      start: 'top top',
+      end: 'bottom bottom',
+      scrub: 1,
+      pin: '.pin-target'
+    }
+  });
+
+  tl.to(hint, { opacity: 0, duration: 0.35 }, 0.25)
+    .to(stemPath, { strokeDashoffset: 0, duration: 3, ease: 'none' }, 0)
+    .to(hillsGroup, { yPercent: -10, duration: 6, ease: 'none' }, 0)
+    .to(particlesGroup, { yPercent: -32, duration: 6, ease: 'none' }, 0)
+    .to(skyTop, { attr: { 'stop-color': '#ffd0c4' }, duration: 6, ease: 'none' }, 0)
+    .to(skyBottom, { attr: { 'stop-color': '#ffe3df' }, duration: 6, ease: 'none' }, 0)
+    .to(starsAll, { opacity: 0, duration: 1.4 }, 1)
+    .to(leaf1, { scale: 1, duration: 1, ease: 'back.out(1.6)' }, 1.1)
+    .to(leaf2, { scale: 1, duration: 1, ease: 'back.out(1.6)' }, 1.6)
+    .to(heartSeed, { opacity: 0.35, scale: 0.8, duration: 1, transformOrigin: '50% 50%' }, 2.4)
+    .to(particlesGroup, { opacity: 1, duration: 1.5 }, 2.2)
+    .to(petalEls, { scale: 1, duration: 1.4, stagger: 0.07, ease: 'back.out(1.8)' }, 3.2)
+    .to(bloomGlow, { opacity: 0.9, duration: 1.5 }, 3.6)
+    .to(centerCircle, { attr: { r: 34 }, duration: 1.2, ease: 'back.out(1.5)' }, 4.3);
+
+  // --- Finale card reveal ---
+  gsap.from('.glass-card', {
+    opacity: 0,
+    y: 46,
+    scale: 0.96,
+    filter: 'blur(14px)',
+    duration: prefersReduced ? 0.4 : 1.1,
+    ease: 'power3.out',
+    scrollTrigger: {
+      trigger: '.finale',
+      start: 'top 72%',
+      toggleActions: 'play none none reverse'
+    }
+  });
+
+  // --- Ambient loops (respect reduced motion) ---
+  if (!prefersReduced) {
+    gsap.to(heartSeed, {
+      scale: 1.08,
+      duration: 0.55,
+      repeat: -1,
+      yoyo: true,
+      ease: 'sine.inOut',
+      transformOrigin: '50% 50%'
+    });
+
+    starsAll.forEach(function (star) {
+      gsap.to(star, {
+        opacity: gsap.utils.random(0.2, 1),
+        duration: gsap.utils.random(1.5, 3.5),
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+        delay: Math.random() * 2
+      });
+    });
+
+    particleEls.forEach(function (particle) {
+      gsap.to(particle, {
+        y: '-=18',
+        duration: gsap.utils.random(3, 6),
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut'
+      });
+    });
+  }
+})();
+</script>
+</body>
+</html>
